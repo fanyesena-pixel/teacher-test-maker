@@ -1077,11 +1077,10 @@ button:active,
 }
 
 .export-panel {
-  position: sticky;
-  top: 0;
-  z-index: 12;
-  isolation: isolate;
-  overflow: hidden;
+  position: static;
+  z-index: auto;
+  isolation: auto;
+  overflow: visible;
   border-color: rgba(36, 52, 59, 0.1);
   background:
     linear-gradient(180deg, rgba(248, 250, 247, 1) 0%, rgba(239, 245, 241, 1) 100%);
@@ -1091,17 +1090,7 @@ button:active,
 }
 
 .export-panel::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  display: block;
-  height: 22px;
-  margin: 0 -16px -16px;
-  background:
-    linear-gradient(180deg, rgba(239, 245, 241, 0), rgba(239, 245, 241, 1) 75%);
-  pointer-events: none;
+  display: none;
 }
 
 .question-grid {
