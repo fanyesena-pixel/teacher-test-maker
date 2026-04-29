@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>先生用テスト作成室 | 学校向けテストサイト</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Yusei+Magic&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="editor-page">
+  <div class="page-shell page-shell-editor">
+    <header class="app-topbar">
+      <div class="app-brand">
+        <a class="back-link" href="index.html">使い方LPへ戻る</a>
+        <div>
+          <p class="eyebrow">Editor Room</p>
+          <h1>先生用テスト作成室</h1>
+        </div>
+      </div>
+      <div class="app-meta">
+        <span class="top-chip">AIなし・外部APIなし</span>
+        <span class="top-chip" id="previewPaperLabel">A4 / 中央の紙と印刷に反映</span>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel panel-form panel-dock">
+        <div class="section-heading">
+          <p class="label">Control</p>
+          <h2>先生用コントロール</h2>
+        </div>
+
+        <form id="exam-form" class="builder-form">
+          <section class="subpanel">
+            <div class="section-heading compact">
+              <p class="label">Template</p>
+              <h3>テストの型</h3>
+            </div>
+            <div class="meta-grid">
+              <label class="full-width">
+                テンプレート
+                <select id="templateId">
+                  <option value="quiz">小テスト</option>
+                  <option value="unit">単元テスト</option>
+                  <option value="term">定期テスト</option>
+                  <option value="retry">再テスト</option>
+                  <option value="homework">宿題プリント</option>
+                  <option value="checksheet">確認プリント</option>
+                </select>
+              </label>
+            </div>
+            <p class="status-box" id="templateSummary">テンプレートを選ぶと、満点・時間・名前欄・印刷の雰囲気が自動で整います。</p>
+          </section>
+
+          <section class="subpanel">
+            <div class="section-heading compact">
+              <p class="label">Test Info</p>
+              <h3>テスト基本情報</h3>
+            </div>
+
+            <div class="meta-grid">
+              <label>
+                学校名
+                <input type="text" id="schoolName" value="南中学校">
+              </label>
+              <label>
+                テスト名
+                <input type="text" id="examTitle" value="歴史の確認テスト">
+              </label>
+              <label>
+                教科
+                <input type="text" id="subject" value="社会">
+              </label>
+              <label>
+                学年
+                <input type="text" id="grade" value="2年">
+              </label>
+              <label>
+                単元
+                <input type="text" id="unit" value="江戸時代">
+              </label>
+              <label>
+                クラス
+                <input type="text" id="className" value="A組">
+              </label>
+              <label>
+                制限時間
+                <input type="number" id="durationMinutes" min="1" step="1" value="30">
+              </label>
+              <label>
+                満点
+                <input type="number" id="maxScore" min="1" step="1" value="50">
+              </label>
+              <label>
+                実施日
+                <input type="date" id="examDate">
+              </label>
+              <label>
+                用紙サイズ
+                <select id="paperSize">
+                  <option value="A4">A4</option>
+                  <option value="B5">B5</option>
+                  <option value="A3">A3</option>
+                  <option value="Letter">Letter</option>
+                </select>
+              </label>
+              <label>
+                名前欄の表示
+                <input type="text" id="nameLabel" value="名前">
+              </label>
+              <label>
+                組欄の表示
+                <input type="text" id="groupLabel" value="組">
+              </label>
+              <label class="full-width">
+                番号欄の表示
+                <input type="text" id="numberLabel" value="番号">
+              </label>
+            </div>
+
+            <div class="toggle-strip">
+              <label class="toggle-chip">
+                <input type="checkbox" id="showNameField" checked>
+                名前欄を出す
+              </label>
+              <label class="toggle-chip">
+                <input type="checkbox" id="showGroupNumberFields" checked>
+                組・番号欄を出す
+              </label>
+            </div>
+
+            <label class="full-width">
+              先生からの注意書き
+              <textarea id="instructions" rows="3">ていねいな字で書き、見直しをしてから提出しましょう。</textarea>
+            </label>
+          </section>
+
+          <section class="subpanel">
+            <div class="section-heading compact">
+              <p class="label">Check</p>
+              <h3>配点チェック</h3>
+            </div>
+
+            <div class="stats-strip">
+              <article>
+                <span>問題数</span>
+                <strong id="totalQuestions">0</strong>
+              </article>
+              <article>
+                <span>合計点</span>
+                <strong id="totalPoints">0点</strong>
+              </article>
+              <article>
+                <span>設定した満点</span>
+                <strong id="maxScoreDisplay">0点</strong>
+              </article>
+              <article>
+                <span>点数チェック</span>
+                <strong id="pointCheckStatus">未確認</strong>
+              </article>
+            </div>
+
+            <p class="status-box" id="pointCheckMessage">問題を入力すると、自動で合計点と警告を確認します。</p>
+
+            <div class="validation-box">
+              <div class="validation-box-top">
+                <strong>印刷前に見ておくところ</strong>
+                <span id="validationCount">0件</span>
+              </div>
+              <div id="validationList" class="validation-list"></div>
+            </div>
+          </section>
+
+          <section class="subpanel">
+            <div class="section-heading compact">
+              <p class="label">Score Helper</p>
+              <h3>配点補助</h3>
+            </div>
+            <p class="support-copy">現在の問題を保ったまま、配点だけを自動で整えます。配点を動かした後は合計点をすぐ再計算します。</p>
+            <div class="action-row">
+              <button type="button" class="secondary" id="autoScore100">100点に自動調整</button>
+              <button type="button" class="secondary" id="autoScore50">50点に自動調整</button>
+              <button type="button" class="secondary" id="equalizePoints">全問同じ配点</button>
+              <button type="button" class="secondary" id="boostShortAnswer">記述問題だけ高配点</button>
+            </div>
+          </section>
+
+          <section class="subpanel export-panel">
+            <div class="section-heading compact">
+              <p class="label">Output</p>
+              <h3>印刷と保存</h3>
+            </div>
+            <p class="support-copy">
+              PDFは別画面で開きます。上の大きなボタンから「印刷またはPDF保存」を押すだけで大丈夫です。
+              JSONはバックアップ用で、先生向けの主機能にはしていません。
+            </p>
+            <div class="export-actions">
+              <button type="button" id="exportStudentPdf">生徒用PDF保存・印刷</button>
+              <button type="button" id="exportTeacherPdf" class="secondary">解答付きPDF保存・印刷</button>
+              <button type="button" id="exportAnswerSheet" class="secondary">解答用紙だけ印刷</button>
+              <button type="button" id="exportCsv" class="secondary">CSV出力</button>
+              <button type="button" id="exportJson" class="secondary">バックアップJSON出力</button>
+              <label class="import-button secondary">
+                バックアップJSON読み込み
+                <input type="file" id="importJson" accept=".json">
+              </label>
+            </div>
+            <p class="support-copy save-state" id="saveState">自動保存の待機中です。</p>
+          </section>
+
+          <section class="subpanel">
+            <div class="section-heading compact">
+              <p class="label">Pattern</p>
+              <h3>A / B / C パターン</h3>
+            </div>
+            <p class="support-copy">元の問題はそのまま残したまま、コピーを使って問題順と選択肢順を入れ替えたA/B/Cを作れます。</p>
+            <div class="toggle-strip">
+              <label class="toggle-chip">
+                <input type="checkbox" id="shuffleQuestionOrder" checked>
+                問題順をシャッフル
+              </label>
+              <label class="toggle-chip">
+                <input type="checkbox" id="shuffleChoiceOrder" checked>
+                選択肢をシャッフル
+              </label>
+            </div>
+            <div class="action-row">
+              <button type="button" id="generatePatterns">A/B/Cパターンを作る</button>
+              <button type="button" id="clearPatterns" class="secondary">A/B/Cを消す</button>
+            </div>
+            <p class="status-box" id="patternStatus">まだA/B/Cパターンは作っていません。</p>
+            <div id="patternList" class="pattern-list"></div>
+          </section>
+        </form>
+      </section>
+
+      <section class="panel panel-preview">
+        <div class="preview-top">
+          <div class="section-heading">
+            <p class="label">Paper View</p>
+            <h2>中央の紙プレビュー</h2>
+          </div>
+          <div class="preview-actions">
+            <div class="preview-variants" id="previewVariants">
+              <button type="button" class="variant-button active" data-variant="base">元のテスト</button>
+              <button type="button" class="variant-button" data-variant="A">A</button>
+              <button type="button" class="variant-button" data-variant="B">B</button>
+              <button type="button" class="variant-button" data-variant="C">C</button>
+            </div>
+            <div class="preview-tabs">
+              <button type="button" class="tab-button active" data-tab="paper">生徒用</button>
+              <button type="button" class="tab-button" data-tab="answer">解答付き</button>
+              <button type="button" class="tab-button" data-tab="answeronly">解答用紙</button>
+              <button type="button" class="tab-button" data-tab="check">チェック</button>
+            </div>
+            <button type="button" id="printPreview" class="ghost-button">生徒用を印刷またはPDF保存</button>
+          </div>
+        </div>
+
+        <p class="status-box" id="previewScope">元のテストを中央表示しています。</p>
+
+        <div class="preview-stack">
+          <article class="paper-view active" id="paper-tab">
+            <div class="paper-sheet" id="paper-sheet"></div>
+          </article>
+          <article class="paper-view" id="answer-tab">
+            <div class="paper-sheet answer-sheet" id="answer-sheet"></div>
+          </article>
+          <article class="paper-view" id="answeronly-tab">
+            <div class="paper-sheet answer-sheet" id="answer-only-sheet"></div>
+          </article>
+          <article class="paper-view" id="check-tab">
+            <div class="paper-sheet map-sheet" id="analysis-sheet"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel panel-bank panel-dock">
+        <div class="section-heading">
+          <p class="label">Questions</p>
+          <h2>問題編集と問題バンク</h2>
+        </div>
+
+        <section class="subpanel subpanel-tight">
+          <div class="section-heading compact">
+            <p class="label">Current Test</p>
+            <h3>今のテスト</h3>
+          </div>
+          <p class="support-copy">問題を追加して、並び替えや複製、問題バンク保存を行います。</p>
+
+          <div class="question-controls">
+            <button type="button" class="ghost-button" data-add-type="multiple">選択問題を追加</button>
+            <button type="button" class="ghost-button" data-add-type="truefalse">○×問題を追加</button>
+            <button type="button" class="ghost-button" data-add-type="short">記述問題を追加</button>
+            <button type="button" class="ghost-button" data-add-type="fill">穴埋め問題を追加</button>
+            <button type="button" class="ghost-button" data-add-type="order">並び替え問題を追加</button>
+          </div>
+
+          <div class="action-row">
+            <button type="button" class="secondary" id="saveAllToBank">今の問題を全部バンク保存</button>
+            <button type="button" class="secondary" id="clearQuestions">問題を全部消す</button>
+          </div>
+
+          <p class="status-box" id="editorStatus">問題は入力するたびに自動保存されます。</p>
+          <div id="question-list" class="question-list"></div>
+        </section>
+
+        <section class="subpanel subpanel-tight">
+          <div class="section-heading compact">
+            <p class="label">Question Bank</p>
+            <h3>問題バンク</h3>
+          </div>
+          <p class="support-copy">作った問題を保存して、次のテストでもすぐ再利用できます。タグや難しさで絞り込みできます。</p>
+
+          <div class="filter-grid">
+            <label>
+              単元タグで絞り込み
+              <input type="text" id="bankTagFilter" placeholder="例: 江戸時代">
+            </label>
+            <label>
+              難しさで絞り込み
+              <select id="bankDifficultyFilter">
+                <option value="all">すべて</option>
+                <option value="easy">やさしめ</option>
+                <option value="standard">ふつう</option>
+                <option value="hard">ややむずかしめ</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="toggle-strip">
+            <label class="toggle-chip">
+              <input type="checkbox" id="bankFavoritesOnly">
+              お気に入りだけ表示
+            </label>
+          </div>
+
+          <div class="action-row">
+            <button type="button" class="secondary" id="resetBank">問題バンクを初期化</button>
+          </div>
+
+          <p class="bank-summary" id="bankStatus">問題バンクはまだ空です。</p>
+          <div id="bank-list" class="bank-list"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
