@@ -1,5 +1,5 @@
-const APP_VERSION = "stage2-2026-04-29";
-const STORAGE_KEY = "exam-workshop-stage2-v1";
+const APP_VERSION = "stage3-2026-04-29";
+const STORAGE_KEY = "exam-workshop-stage3-v1";
 const BANK_STORAGE_KEY = "exam-workshop-bank-v1";
 const LEGACY_STORAGE_KEYS = ["exam-workshop-stage1-v1", "exam-workshop-studio-v2"];
 
@@ -25,6 +25,9 @@ const editorStatus = document.getElementById("editorStatus");
 const bankStatus = document.getElementById("bankStatus");
 const patternStatus = document.getElementById("patternStatus");
 const templateSummary = document.getElementById("templateSummary");
+const paperBaseSizeDisplay = document.getElementById("paperBaseSizeDisplay");
+const paperTotalSizeDisplay = document.getElementById("paperTotalSizeDisplay");
+const layoutSummary = document.getElementById("layoutSummary");
 const previewVariantButtons = Array.from(document.querySelectorAll(".variant-button"));
 
 const textMetaFieldIds = [
@@ -39,6 +42,16 @@ const textMetaFieldIds = [
   "maxScore",
   "examDate",
   "paperSize",
+  "customPaperWidthMm",
+  "customPaperHeightMm",
+  "paperTilesX",
+  "paperTilesY",
+  "layoutMode",
+  "globalFontSize",
+  "questionGap",
+  "lineHeight",
+  "sideMarginMm",
+  "topBottomMarginMm",
   "nameLabel",
   "groupLabel",
   "numberLabel",
@@ -124,9 +137,14 @@ const answerSpaceOptions = {
 
 const paperSizes = {
   A4: { label: "A4", widthMm: 210, heightMm: 297, previewWidthPx: 710 },
-  B5: { label: "B5", widthMm: 182, heightMm: 257, previewWidthPx: 620 },
   A3: { label: "A3", widthMm: 297, heightMm: 420, previewWidthPx: 860 },
-  Letter: { label: "Letter", widthMm: 216, heightMm: 279, previewWidthPx: 730 }
+  A5: { label: "A5", widthMm: 148, heightMm: 210, previewWidthPx: 560 },
+  B4: { label: "B4", widthMm: 257, heightMm: 364, previewWidthPx: 820 },
+  B5: { label: "B5", widthMm: 182, heightMm: 257, previewWidthPx: 620 },
+  Letter: { label: "Letter", widthMm: 216, heightMm: 279, previewWidthPx: 730 },
+  Legal: { label: "Legal", widthMm: 216, heightMm: 356, previewWidthPx: 730 },
+  Postcard: { label: "はがき", widthMm: 100, heightMm: 148, previewWidthPx: 420 },
+  Custom: { label: "自由サイズ", widthMm: 210, heightMm: 297, previewWidthPx: 710 }
 };
 
 const testTemplates = {
@@ -138,7 +156,12 @@ const testTemplates = {
     layoutMode: "compact",
     showNameField: true,
     showGroupNumberFields: true,
-    recommendedQuestionCount: 5
+    recommendedQuestionCount: 5,
+    globalFontSize: "15",
+    questionGap: "5",
+    lineHeight: "1.7",
+    sideMarginMm: "12",
+    topBottomMarginMm: "12"
   },
   unit: {
     label: "単元テスト",
@@ -148,7 +171,12 @@ const testTemplates = {
     layoutMode: "standard",
     showNameField: true,
     showGroupNumberFields: true,
-    recommendedQuestionCount: 8
+    recommendedQuestionCount: 8,
+    globalFontSize: "16",
+    questionGap: "7",
+    lineHeight: "1.8",
+    sideMarginMm: "14",
+    topBottomMarginMm: "14"
   },
   term: {
     label: "定期テスト",
@@ -158,7 +186,12 @@ const testTemplates = {
     layoutMode: "spacious",
     showNameField: true,
     showGroupNumberFields: true,
-    recommendedQuestionCount: 10
+    recommendedQuestionCount: 10,
+    globalFontSize: "16",
+    questionGap: "8",
+    lineHeight: "1.9",
+    sideMarginMm: "14",
+    topBottomMarginMm: "15"
   },
   retry: {
     label: "再テスト",
@@ -168,7 +201,12 @@ const testTemplates = {
     layoutMode: "standard",
     showNameField: true,
     showGroupNumberFields: true,
-    recommendedQuestionCount: 8
+    recommendedQuestionCount: 8,
+    globalFontSize: "16",
+    questionGap: "7",
+    lineHeight: "1.8",
+    sideMarginMm: "14",
+    topBottomMarginMm: "14"
   },
   homework: {
     label: "宿題プリント",
@@ -178,7 +216,12 @@ const testTemplates = {
     layoutMode: "compact",
     showNameField: true,
     showGroupNumberFields: true,
-    recommendedQuestionCount: 6
+    recommendedQuestionCount: 6,
+    globalFontSize: "15",
+    questionGap: "5",
+    lineHeight: "1.7",
+    sideMarginMm: "12",
+    topBottomMarginMm: "12"
   },
   checksheet: {
     label: "確認プリント",
@@ -188,7 +231,12 @@ const testTemplates = {
     layoutMode: "compact",
     showNameField: true,
     showGroupNumberFields: true,
-    recommendedQuestionCount: 6
+    recommendedQuestionCount: 6,
+    globalFontSize: "15",
+    questionGap: "5",
+    lineHeight: "1.7",
+    sideMarginMm: "12",
+    topBottomMarginMm: "12"
   }
 };
 
@@ -225,6 +273,15 @@ function createDefaultMeta() {
     maxScore: template.maxScore,
     examDate: "",
     paperSize: template.paperSize,
+    customPaperWidthMm: "210",
+    customPaperHeightMm: "297",
+    paperTilesX: "1",
+    paperTilesY: "1",
+    globalFontSize: template.globalFontSize,
+    questionGap: template.questionGap,
+    lineHeight: template.lineHeight,
+    sideMarginMm: template.sideMarginMm,
+    topBottomMarginMm: template.topBottomMarginMm,
     nameLabel: "名前",
     groupLabel: "組",
     numberLabel: "番号",
@@ -287,6 +344,19 @@ function getDefaultAnswerSpace(type) {
   return type === "short" || type === "order" ? "medium" : "small";
 }
 
+function getDefaultAnswerAreaHeightMm(type) {
+  if (type === "multiple" || type === "truefalse") {
+    return "12";
+  }
+  if (type === "fill") {
+    return "18";
+  }
+  if (type === "order") {
+    return "28";
+  }
+  return "36";
+}
+
 function convertAnswerLinesToSpace(value, type) {
   const number = Number(value);
   if (!Number.isFinite(number) || number <= 1) {
@@ -321,6 +391,12 @@ function normalizeQuestion(raw = {}) {
     answerSpace: Object.prototype.hasOwnProperty.call(answerSpaceOptions, raw.answerSpace)
       ? raw.answerSpace
       : convertAnswerLinesToSpace(raw.answerLines, type),
+    questionFontSize: String(raw.questionFontSize ?? raw.fontSize ?? "16"),
+    choiceFontSize: String(raw.choiceFontSize ?? "15"),
+    answerAreaHeightMm: String(raw.answerAreaHeightMm ?? getDefaultAnswerAreaHeightMm(type)),
+    blockPaddingMm: String(raw.blockPaddingMm ?? "4"),
+    blockWidthPercent: String(raw.blockWidthPercent ?? "100"),
+    figureSpaceHeightMm: String(raw.figureSpaceHeightMm ?? "0"),
     choices: questionTypes[type].usesChoices ? choices : ""
   };
 }
@@ -335,6 +411,12 @@ function createEmptyQuestion(type = "multiple", overrides = {}) {
     difficulty: overrides.difficulty ?? "standard",
     unitTag: overrides.unitTag ?? state.meta.unit ?? createDefaultMeta().unit,
     answerSpace: overrides.answerSpace ?? getDefaultAnswerSpace(type),
+    questionFontSize: overrides.questionFontSize ?? "16",
+    choiceFontSize: overrides.choiceFontSize ?? "15",
+    answerAreaHeightMm: overrides.answerAreaHeightMm ?? getDefaultAnswerAreaHeightMm(type),
+    blockPaddingMm: overrides.blockPaddingMm ?? "4",
+    blockWidthPercent: overrides.blockWidthPercent ?? "100",
+    figureSpaceHeightMm: overrides.figureSpaceHeightMm ?? "0",
     choices: overrides.choices ?? questionTypes[type].sampleChoices
   });
 }
