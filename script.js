@@ -4341,5 +4341,21 @@ function renderDerivedViews(validation = getValidationState()) {
   editorStatus.textContent = uiState.editorMessage;
 }
 
+function stage3EnsureIntegratedPaperButton() {
+  const exportActions = document.querySelector(".export-actions");
+  const studentButton = document.getElementById("exportStudentPdf");
+  if (!exportActions || !studentButton || document.getElementById("exportIntegratedSheet")) {
+    return;
+  }
+  const button = document.createElement("button");
+  button.type = "button";
+  button.id = "exportIntegratedSheet";
+  button.className = "secondary";
+  button.textContent = "問題と回答欄を一体化して印刷";
+  button.addEventListener("click", () => openPrintableDocument("paper"));
+  studentButton.insertAdjacentElement("afterend", button);
+}
+
+stage3EnsureIntegratedPaperButton();
 stage3EnsureCombinedExportButton();
 renderDerivedViews(getValidationState());
