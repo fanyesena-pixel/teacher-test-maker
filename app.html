@@ -52,7 +52,7 @@
                 </select>
               </label>
             </div>
-            <p class="status-box" id="templateSummary">テンプレートを選ぶと、満点・時間・名前欄・印刷の雰囲気が自動で整います。</p>
+            <p class="status-box" id="templateSummary">テンプレートを選ぶと、満点・時間・問題数のめやす・印刷の雰囲気が自動で整います。</p>
           </section>
 
           <section class="subpanel">
@@ -99,15 +99,6 @@
                 <input type="date" id="examDate">
               </label>
               <label>
-                用紙サイズ
-                <select id="paperSize">
-                  <option value="A4">A4</option>
-                  <option value="B5">B5</option>
-                  <option value="A3">A3</option>
-                  <option value="Letter">Letter</option>
-                </select>
-              </label>
-              <label>
                 名前欄の表示
                 <input type="text" id="nameLabel" value="名前">
               </label>
@@ -115,7 +106,7 @@
                 組欄の表示
                 <input type="text" id="groupLabel" value="組">
               </label>
-              <label class="full-width">
+              <label>
                 番号欄の表示
                 <input type="text" id="numberLabel" value="番号">
               </label>
@@ -136,6 +127,95 @@
               先生からの注意書き
               <textarea id="instructions" rows="3">ていねいな字で書き、見直しをしてから提出しましょう。</textarea>
             </label>
+          </section>
+
+          <section class="subpanel">
+            <div class="section-heading compact">
+              <p class="label">Paper</p>
+              <h3>用紙サイズ</h3>
+            </div>
+
+            <div class="meta-grid">
+              <label>
+                用紙サイズ
+                <select id="paperSize">
+                  <option value="A4">A4</option>
+                  <option value="A3">A3</option>
+                  <option value="A5">A5</option>
+                  <option value="B4">B4</option>
+                  <option value="B5">B5</option>
+                  <option value="Letter">Letter</option>
+                  <option value="Legal">Legal</option>
+                  <option value="Postcard">はがき</option>
+                  <option value="Custom">自由サイズ</option>
+                </select>
+              </label>
+              <label>
+                レイアウトモード
+                <select id="layoutMode">
+                  <option value="standard">標準</option>
+                  <option value="compact">詰め込み</option>
+                  <option value="spacious">ゆったり</option>
+                  <option value="largeText">大きめ文字</option>
+                  <option value="smallText">小さめ文字</option>
+                  <option value="wideAnswers">解答欄広め</option>
+                  <option value="onePage">1ページに収める</option>
+                </select>
+              </label>
+              <label id="customPaperWidthWrap">
+                幅 mm
+                <input type="number" id="customPaperWidthMm" min="1" step="1" value="210">
+              </label>
+              <label id="customPaperHeightWrap">
+                高さ mm
+                <input type="number" id="customPaperHeightMm" min="1" step="1" value="297">
+              </label>
+              <label>
+                横に何枚分
+                <input type="number" id="paperTilesX" min="1" step="1" value="1">
+              </label>
+              <label>
+                縦に何枚分
+                <input type="number" id="paperTilesY" min="1" step="1" value="1">
+              </label>
+            </div>
+
+            <div class="status-pair">
+              <p class="status-box" id="paperBaseSizeDisplay">元の用紙サイズ: A4 210mm × 297mm</p>
+              <p class="status-box" id="paperTotalSizeDisplay">合計サイズ: 210mm × 297mm</p>
+            </div>
+          </section>
+
+          <section class="subpanel">
+            <div class="section-heading compact">
+              <p class="label">Layout</p>
+              <h3>見た目の調整</h3>
+            </div>
+
+            <div class="meta-grid">
+              <label>
+                全体の文字サイズ
+                <input type="number" id="globalFontSize" min="8" max="40" step="1" value="16">
+              </label>
+              <label>
+                問題の間隔
+                <input type="number" id="questionGap" min="0" max="40" step="1" value="7">
+              </label>
+              <label>
+                行間
+                <input type="number" id="lineHeight" min="1" max="3" step="0.1" value="1.8">
+              </label>
+              <label>
+                左右余白
+                <input type="number" id="sideMarginMm" min="4" max="60" step="1" value="14">
+              </label>
+              <label>
+                上下余白
+                <input type="number" id="topBottomMarginMm" min="4" max="60" step="1" value="14">
+              </label>
+            </div>
+
+            <p class="status-box" id="layoutSummary">文字の大きさや余白を変えると、中央の紙プレビューにすぐ反映されます。</p>
           </section>
 
           <section class="subpanel">
@@ -190,17 +270,17 @@
 
           <section class="subpanel export-panel">
             <div class="section-heading compact">
-              <p class="label">Output</p>
+              <p class="label">Print & Save</p>
               <h3>印刷と保存</h3>
             </div>
             <p class="support-copy">
-              PDFは別画面で開きます。上の大きなボタンから「印刷またはPDF保存」を押すだけで大丈夫です。
+              印刷は別画面で開きます。上の大きなボタンから「印刷またはPDF保存」を押すだけで大丈夫です。
               JSONはバックアップ用で、先生向けの主機能にはしていません。
             </p>
             <div class="export-actions">
-              <button type="button" id="exportStudentPdf">生徒用PDF保存・印刷</button>
-              <button type="button" id="exportTeacherPdf" class="secondary">解答付きPDF保存・印刷</button>
-              <button type="button" id="exportAnswerSheet" class="secondary">解答用紙だけ印刷</button>
+              <button type="button" id="exportStudentPdf">問題用紙を印刷</button>
+              <button type="button" id="exportAnswerSheet" class="secondary">解答用紙を印刷</button>
+              <button type="button" id="exportTeacherPdf" class="secondary">解答付き教師用を印刷</button>
               <button type="button" id="exportCsv" class="secondary">CSV出力</button>
               <button type="button" id="exportJson" class="secondary">バックアップJSON出力</button>
               <label class="import-button secondary">
@@ -251,12 +331,12 @@
               <button type="button" class="variant-button" data-variant="C">C</button>
             </div>
             <div class="preview-tabs">
-              <button type="button" class="tab-button active" data-tab="paper">生徒用</button>
-              <button type="button" class="tab-button" data-tab="answer">解答付き</button>
+              <button type="button" class="tab-button active" data-tab="paper">問題用紙</button>
               <button type="button" class="tab-button" data-tab="answeronly">解答用紙</button>
+              <button type="button" class="tab-button" data-tab="answer">解答付き教師用</button>
               <button type="button" class="tab-button" data-tab="check">チェック</button>
             </div>
-            <button type="button" id="printPreview" class="ghost-button">生徒用を印刷またはPDF保存</button>
+            <button type="button" id="printPreview" class="ghost-button">問題用紙を印刷またはPDF保存</button>
           </div>
         </div>
 
@@ -266,11 +346,11 @@
           <article class="paper-view active" id="paper-tab">
             <div class="paper-sheet" id="paper-sheet"></div>
           </article>
-          <article class="paper-view" id="answer-tab">
-            <div class="paper-sheet answer-sheet" id="answer-sheet"></div>
-          </article>
           <article class="paper-view" id="answeronly-tab">
             <div class="paper-sheet answer-sheet" id="answer-only-sheet"></div>
+          </article>
+          <article class="paper-view" id="answer-tab">
+            <div class="paper-sheet answer-sheet" id="answer-sheet"></div>
           </article>
           <article class="paper-view" id="check-tab">
             <div class="paper-sheet map-sheet" id="analysis-sheet"></div>
@@ -289,7 +369,7 @@
             <p class="label">Current Test</p>
             <h3>今のテスト</h3>
           </div>
-          <p class="support-copy">問題を追加して、並び替えや複製、問題バンク保存を行います。</p>
+          <p class="support-copy">問題を追加して、並び替え、複製、問題バンク保存、印刷向けの大きさ調整を行います。</p>
 
           <div class="question-controls">
             <button type="button" class="ghost-button" data-add-type="multiple">選択問題を追加</button>
